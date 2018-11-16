@@ -1,0 +1,145 @@
+### Jiaxin Ge
+### 58153795
+### Columns_UI
+
+from game_mechanics import ColumnState
+import game_mechanics
+
+
+def run() -> None:
+    '''
+    The main function of the game
+    '''
+    column_state = _init()
+    command (column_state)
+
+
+def _init():
+    '''
+    The initiation of the game setup
+    '''
+    row = int (input())
+    column = int (input())
+    mode = input()
+
+    column_state = ColumnState(row, column)
+    
+    if mode == "EMPTY":
+        column_state = mode_empty(column_state)
+
+    elif mode == "CONTENTS":
+        column_state = mode_contents(column_state)
+
+    column_state.print_game_board()
+    return column_state
+    
+
+def command(column_state: ColumnState):
+    '''
+    The input command of the game
+    '''
+    finish = False
+
+    while not finish:
+        command = input()
+
+        if command == "":
+            column_state = Blank_command(column_state)
+        
+        elif command[0] == "F":
+            column_state = F_command(column_state, command)
+
+        elif command[0] == "R":
+            column_state = R_command(column_state)
+
+        elif command[0] == ">":
+            column_state = Right_command (column_state)
+
+        elif command[0] == "<":
+            column_state = Left_command (column_state)
+
+        elif command[0] == "Q":
+            finish = True
+
+
+def Left_command (column_state:ColumnState):
+    '''
+    left command: move the faller to the left
+    '''
+    column_state.move_to_left()
+    column_state.print_game_board()
+    return column_state        
+
+    
+def Right_command (column_state:ColumnState):
+    '''
+    right command: move the faller to the right
+    '''
+    column_state.move_to_right()
+    column_state.print_game_board()
+    return column_state
+
+
+def R_command (column_state: ColumnState):
+    '''
+    R command: rotate the faller
+    '''
+    column_state.rotate()
+    column_state.print_game_board()
+    return column_state
+    
+  
+def Blank_command(column_state: ColumnState):
+    '''
+    blank command: including asterisk column, eliminate asterisk column and drop the faller
+    '''
+    try:
+        column_state.eliminate()
+        column_state.drop()
+        column_state.asterisk()
+        column_state.print_game_board()
+        return column_state 
+    except game_mechanics.GameOverError:
+        print_game_over_banner()
+        quit()
+
+   
+def F_command (column_state: ColumnState, command: str):
+    '''
+    F command: add new faller with a falling column and specific colors
+    '''
+    command_list = command.split()
+    falling_column = int (command_list[1]) -1
+    faller_list = [command_list[2], command_list[3], command_list[4]]
+    column_state.F_command_init(command_list[4], falling_column, faller_list)
+    column_state.print_game_board()      
+    return column_state
+     
+
+def mode_empty(column_state: ColumnState):
+    '''
+    start the game with an empty board
+    '''
+    column_state.new_game()
+    return column_state
+
+
+def mode_contents(column_state: ColumnState):
+    '''
+    start the game with contents in it
+    '''
+    column_state.new_game()
+    column_state.content_init()
+    column_state.content_drop()
+    return column_state
+
+
+def print_game_over_banner():
+    '''
+    the game over banner of the game'''
+    print ("GAME OVER")
+
+
+if __name__ == "__main__":
+    run()
+
